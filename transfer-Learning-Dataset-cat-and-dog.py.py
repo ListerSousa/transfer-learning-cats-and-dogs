@@ -161,3 +161,55 @@ print("Modelo salvo com sucesso!")
 
 from google.colab import files
 files.download("cats_vs_dogs_transfer.h5")
+
+## Gerando a matriz de confusão para avaliar o modelo
+
+from sklearn.metrics import confusion_matrix
+import numpy as np
+
+# Exemplo: gerar previsões no conjunto de validação
+Y_pred = model.predict(val_generator)
+Y_pred = (Y_pred > 0.5).astype(int)  # binariza as saídas (0 ou 1)
+
+# Verdadeiros rótulos
+Y_true = val_generator.classes
+
+# Matriz de confusão
+cm = confusion_matrix(Y_true, Y_pred)
+cm
+## Metricas manual
+
+TN, FP, FN, TP = cm.ravel()
+
+# Fórmulas
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+precision = TP / (TP + FP)
+recall = TP / (TP + FN)
+specificity = TN / (TN + FP)
+f1_score = 2 * (precision * recall) / (precision + recall)
+
+print(f"Acurácia:      {accuracy:.4f}")
+print(f"Precisão:      {precision:.4f}")
+print(f"Sensibilidade: {recall:.4f}")
+print(f"Especificidade:{specificity:.4f}")
+print(f"F1-score:      {f1_score:.4f}")
+
+# Visualizando as metricas
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+
+print(f"Acurácia (sklearn):      {accuracy_score(Y_true, Y_pred):.4f}")
+print(f"Precisão (sklearn):      {precision_score(Y_true, Y_pred):.4f}")
+print(f"Sensibilidade (sklearn): {recall_score(Y_true, Y_pred):.4f}")
+print(f"F1-score (sklearn):      {f1_score(Y_true, Y_pred):.4f}")
+
+# Plotando a matriz com plt
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+            xticklabels=['Gato (Prev.)','Cachorro (Prev.)'],
+            yticklabels=['Gato (Real)','Cachorro (Real)'])
+plt.xlabel("Predito")
+plt.ylabel("Real")
+plt.title("Matriz de Confusão")
+plt.show()
